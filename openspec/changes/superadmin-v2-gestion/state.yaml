@@ -1,0 +1,18 @@
+change: superadmin-v2-gestion
+status: completed
+phases:
+  - id: phase-1-abm-clientes
+    status: completed
+    note: Tests + Actions + UI (list, create, detail/edit/delete) completados
+  - id: phase-2-abm-negocios
+    status: completed
+    note: Tests + Actions + UI (list, create, edit) completados  
+  - id: phase-3-catalogo-planes
+    status: completed
+    note: Actions + UI page + sidebar actualizada completados
+  - id: phase-4-logs-superadmin
+    status: completed
+    note: Helper + Actions + UI page + sidebar actualizada completados
+created_at: 2026-06-24
+updated_at: 2026-06-24
+artifact_store: openspec

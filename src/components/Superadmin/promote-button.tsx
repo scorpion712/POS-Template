@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -39,10 +40,9 @@ export const PromoteUserButton = ({ userId, currentRole, hasBusiness }: PromoteP
         promoteToAdmin(userId, businessName, slug)
             .then((data) => {
                 if ('error' in data && data.error) {
-                    console.error(data.error);
-                    // toast.error(data.error);
-                    alert(data.error as string); // Fallback
+                    toast.error(data.error as string);
                 } else {
+                    toast.success("Usuario promovido a ADMIN correctamente");
                     setOpen(false);
                 }
             });

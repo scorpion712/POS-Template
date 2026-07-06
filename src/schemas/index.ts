@@ -1,5 +1,6 @@
 import { PaidStatus, Status } from "@/models/Order";
 import * as z from "zod";
+import { validateCuit, validateCertPEM, validateKeyPEM } from "@/lib/validators";
 
 // const MAX_UPLOAD_SIZE = 1024 * 1024 * 3; // 3MB
 // const ACCEPTED_FILE_TYPES = ["image/png"];
@@ -145,47 +146,32 @@ export const AccountSchema = z
   });
 
 /**
- * Valida un CUIT/CUIL argentino usando el algoritmo de módulo 11.
- * Acepta formatos con o sin guiones (20-12345678-9 o 20123456789).
- */
-function isValidCuit(value: string): boolean {
-  const cleaned = value.replace(/\D/g, "");
-  if (cleaned.length !== 11) return false;
-
-  // Los primeros 2 dígitos identifican el tipo (persona/empresa)
-  const type = parseInt(cleaned.substring(0, 2), 10);
-  const validTypes = [20, 23, 24, 27, 30, 33, 34];
-  if (!validTypes.includes(type)) return false;
-
-  // Algoritmo de módulo 11 de AFIP
-  const multipliers = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2];
-  let sum = 0;
-  for (let i = 0; i < 10; i++) {
-    sum += parseInt(cleaned[i], 10) * multipliers[i];
-  }
-
-  const mod = 11 - (sum % 11);
-  const checkDigit = mod === 11 ? 0 : mod === 10 ? 9 : mod;
-
-  return checkDigit === parseInt(cleaned[10], 10);
-}
-
-/**
  * Esquema de validación para los campos de ARCA/AFIP.
  * CUIT se valida con regex de formato + algoritmo de módulo 11.
  */
 export const ArcaFieldsSchema = z.object({
   cuit: z
     .string()
-    .min(1, "CUIT es obligatorio")
-    .regex(/^\d{2}-?\d{8}-?\d$/, "Formato inválido. Usá 20-12345678-9 o 20123456789")
-    .refine(isValidCuit, "CUIT inválido. El dígito verificador no coincide."),
-  razonSocial: z.string().min(1, "Razón Social es obligatoria"),
+    .min(1, { message: "CUIT es obligatorio" })
+    .refine(validateCuit, { message: "CUIT inválido" }),
+  razonSocial: z.string().min(1, { message: "Razón Social es obligatoria" }),
   inicioActividades: z.date({
     required_error: "Inicio de actividades es obligatorio",
   }),
   condicionIva: z.enum(["RESPONSABLE_INSCRIPTO", "MONOTRIBUTO"]),
-  cert: z.string().optional(),
-  key: z.string().optional(),
+  cert: z
+    .string()
+    .optional()
+    .refine((val) => !val || validateCertPEM(val), {
+      message:
+        "Formato de certificado inválido. Debe comenzar con -----BEGIN CERTIFICATE-----",
+    }),
+  key: z
+    .string()
+    .optional()
+    .refine((val) => !val || validateKeyPEM(val), {
+      message:
+        "Formato de clave privada inválida. Debe comenzar con -----BEGIN PRIVATE KEY-----",
+    }),
   ptoVenta: z.array(z.coerce.number().int().positive()).default([]),
 });

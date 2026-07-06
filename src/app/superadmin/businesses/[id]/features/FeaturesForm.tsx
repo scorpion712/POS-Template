@@ -32,8 +32,8 @@ interface FeaturesFormProps {
   planDefinitions: Array<{
     id: string;
     name: string;
-    features: any;
-    limits: any;
+    features: Record<string, unknown>;
+    limits: Record<string, unknown>;
     description: string | null;
     displayOrder: number;
   }>;
@@ -157,6 +157,58 @@ const PRESETS: PlanPreset[] = [
   },
 ];
 
+const PLAN_COLORS: Record<string, { accent: string; border: string }> = {
+  BASIC: {
+    accent: "from-slate-500/10 to-gray-500/5 text-slate-500 border-slate-200/50 dark:border-slate-800/40",
+    border: "hover:border-slate-400 focus:border-slate-400",
+  },
+  PRO: {
+    accent: "from-indigo-500/10 to-violet-500/5 text-indigo-500 border-indigo-200/50 dark:border-indigo-800/40",
+    border: "hover:border-indigo-400 focus:border-indigo-400",
+  },
+  ENTERPRISE: {
+    accent: "from-amber-500/10 to-orange-500/5 text-amber-500 border-amber-200/50 dark:border-amber-800/40",
+    border: "hover:border-amber-400 focus:border-amber-400",
+  },
+};
+
+const DEFAULT_COLORS = {
+  accent: "from-indigo-500/10 to-violet-500/5 text-indigo-500 border-indigo-200/50 dark:border-indigo-800/40",
+  border: "hover:border-indigo-400 focus:border-indigo-400",
+};
+
+function getPlanColors(planName: string) {
+  return PLAN_COLORS[planName.toUpperCase()] ?? DEFAULT_COLORS;
+}
+
+function generateFeaturesList(plan: {
+  hasAfipBilling: boolean;
+  hasPublicCatalog: boolean;
+  hasClientLedger: boolean;
+  hasMultiCashbox: boolean;
+  hasSupplierFilter: boolean;
+  hasBudget: boolean;
+  maxUsers: number;
+  maxProducts: number;
+}) {
+  return [
+    {
+      text: plan.maxUsers >= 999 ? "Usuarios Ilimitados (Soporta 999)" : `Hasta ${plan.maxUsers} Usuarios`,
+      included: true,
+    },
+    {
+      text: plan.maxProducts >= 99999 ? "Productos Ilimitados (Soporta 99999)" : `Hasta ${plan.maxProducts} Productos`,
+      included: true,
+    },
+    { text: "Facturación AFIP (ARCA)", included: plan.hasAfipBilling },
+    { text: "Catálogo Público Web", included: plan.hasPublicCatalog },
+    { text: "Cuentas Corrientes (Ledger)", included: plan.hasClientLedger },
+    { text: "Múltiples Cajas de Venta", included: plan.hasMultiCashbox },
+    { text: "Filtro por Proveedor", included: plan.hasSupplierFilter },
+    { text: "Presupuestos", included: plan.hasBudget },
+  ];
+}
+
 export function FeaturesForm({ businessId, businessName, planDefinitions, initialFeatures }: FeaturesFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -219,7 +271,7 @@ export function FeaturesForm({ businessId, businessName, planDefinitions, initia
   };
 
   return (
-    <div className="space-y-8 pb-12 animate-fade-in-up">
+    <div className="space-y-8 animate-fade-in-up">
       {/* 1. Subscription Presets Section */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">

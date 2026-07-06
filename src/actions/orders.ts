@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { MovementType, OrderStatus, PaidStatus } from "@prisma/client";
 import { revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/cache-tags";
-import { requireFeature, assertWritePermission } from "@/lib/auth-gates";
+import { requireFeature, FeatureNotEnabledError } from "@/lib/feature-gates";
+import { assertWritePermission } from "@/lib/auth-gates";
 import { fail } from "@/lib/action-result";
 import { after } from "next/server";
 import { processInBatches, bulkUpdateStock } from "@/lib/batch-utils";
@@ -42,8 +43,12 @@ export const createOrder = async (order: OrderInput) => {
     const allowNegativeStock = (permissionResult.data?.business?.features as Record<string, unknown>)?.hasNegativeStock === true;
 
     if (order.paidStatus === "inpago") {
-      const featureResult = await requireFeature("hasClientLedger");
-      if (!featureResult.success) return { error: featureResult.error };
+      try {
+        await requireFeature(order.businessId, "client-ledger");
+      } catch (e) {
+        if (e instanceof FeatureNotEnabledError) return { error: e.message };
+        throw e;
+      }
     }
 
     const result = await db.$transaction(async (tx) => {
@@ -340,8 +345,15 @@ export const updateOrderPaidStatus = async (orderId: string, newStatus: PaidStat
         if (!permissionResult.success) return { error: permissionResult.error };
 
         if (newStatus === "inpago") {
-            const featureResult = await requireFeature("hasClientLedger");
-            if (!featureResult.success) return { error: featureResult.error };
+            const businessId = permissionResult.data?.businessId;
+            if (businessId) {
+              try {
+                await requireFeature(businessId, "client-ledger");
+              } catch (e) {
+                if (e instanceof FeatureNotEnabledError) return { error: e.message };
+                throw e;
+              }
+            }
         }
         await db.$transaction(async (tx) => {
            const order = await tx.order.findUnique({ where: { id: orderId } });

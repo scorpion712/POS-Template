@@ -86,6 +86,11 @@ export const getPublicProductById = async (
     return null;
   }
 
+  const effectivePlan = await getEffectivePlan(businessId);
+  if (!effectivePlan.hasPublicCatalog) {
+    return null;
+  }
+
   try {
     const product = await db.product.findFirst({
       where: {

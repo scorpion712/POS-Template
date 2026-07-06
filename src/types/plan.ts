@@ -19,6 +19,7 @@ export interface ResolvedFeatures {
 export interface PlanSeed {
   name: string;
   description?: string;
+  price?: number;
   features: Omit<ResolvedFeatures, "plan" | "maxUsers" | "maxProducts" | "maxCashboxes" | "maxClients" | "dailySalesLimit" | "dailyProductsLimit" | "dailyClientsLimit">;
   limits: Pick<ResolvedFeatures, "maxUsers" | "maxProducts" | "maxCashboxes" | "maxClients" | "dailySalesLimit" | "dailyProductsLimit" | "dailyClientsLimit">;
   isDefault?: boolean;
@@ -30,6 +31,7 @@ export const PLAN_SEEDS: PlanSeed[] = [
   {
     name: "BASIC",
     description: "Plan básico para negocios pequeños",
+    price: 15000,
     features: {
       hasAfipBilling: false,
       hasPublicCatalog: false,
@@ -54,6 +56,7 @@ export const PLAN_SEEDS: PlanSeed[] = [
   {
     name: "PRO",
     description: "Plan profesional para negocios en crecimiento",
+    price: 45000,
     features: {
       hasAfipBilling: true,
       hasPublicCatalog: true,
@@ -77,6 +80,7 @@ export const PLAN_SEEDS: PlanSeed[] = [
   {
     name: "ENTERPRISE",
     description: "Plan empresarial sin límites",
+    price: 120000,
     features: {
       hasAfipBilling: true,
       hasPublicCatalog: true,

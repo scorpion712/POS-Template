@@ -90,15 +90,13 @@ const getClientUnpaidOrderSchema = z.object({
 
 export const createUnpaidOrder = async (input: CreateUnpaidOrderInput): Promise<ActionResult> => {
   try {
-    const featureResult = await requireFeature("hasClientLedger");
-    if (!featureResult.success) return { success: false, error: featureResult.error };
     const session = await auth();
     const businessId = session?.user?.businessId || input.businessId;
     if (!businessId) return { success: false, error: "No autorizado" };
     const allowNegativeStock = (session?.user?.business?.features as Record<string, unknown>)?.hasNegativeStock === true;
 
     // Hoist ranking data so after() can access it
-    let rankingItems: { productId: string; quantity: number; price: number }[] = [];
+    const rankingItems: { productId: string; quantity: number; price: number }[] = [];
 
     const result = await db.$transaction(async (tx) => {
       const client = await tx.client.findUnique({
@@ -303,7 +301,7 @@ export const cancelUnpaidOrder = async (input: CancelUnpaidOrderInput): Promise<
     if (!businessId) return { success: false, error: "No autorizado" };
 
     // Hoist ranking data for after()
-    let rankingItems: { productId: string; quantity: number; price: number }[] = [];
+    const rankingItems: { productId: string; quantity: number; price: number }[] = [];
 
     const result = await db.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
@@ -490,7 +488,7 @@ export const addItemsToOrder = async (input: z.infer<typeof addItemsToOrderSchem
     const allowNegativeStock = (session?.user?.business?.features as Record<string, unknown>)?.hasNegativeStock === true;
 
     // Hoist ranking data for after()
-    let rankingItems: { productId: string; quantity: number; price: number }[] = [];
+    const rankingItems: { productId: string; quantity: number; price: number }[] = [];
 
     const result = await db.$transaction(async (tx) => {
       const order = await tx.order.findUnique({

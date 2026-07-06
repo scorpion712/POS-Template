@@ -17,8 +17,8 @@ export function NavigationMenuHeader() {
   const { open: mobileOpen, setOpen: setMobileOpen } = useMobileNav();
   const businessName = session?.user?.businessName || "Stock.ia";
 
-  // Ocultar el header en el catálogo público
-  if (pathname?.includes("/catalogo")) return null;
+  // Ocultar el header en catálogo público y superadmin
+  if (pathname?.includes("/catalogo") || pathname?.startsWith("/superadmin")) return null;
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200/60 dark:border-gray-800/50 bg-white/75 dark:bg-gray-950/75 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-gray-950/60">

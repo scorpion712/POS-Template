@@ -29,7 +29,6 @@ vi.mock("@/lib/pusher-server", () => ({
     trigger: vi.fn().mockResolvedValue({}),
   },
 }));
-});
 
 describe("registerPayment", () => {
   beforeEach(() => {

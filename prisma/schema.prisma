@@ -92,6 +92,7 @@ model Business {
   orderUpdates      OrderUpdate[]
   planDefinitionId String?
   planDefinition   PlanDefinition? @relation(fields: [planDefinitionId], references: [id])
+  payments          SubscriptionPayment[]
 }
 
 enum BusinessStatus {
@@ -155,8 +156,8 @@ model User {
   image         String?
   accounts      Account[]
 
-  businessId   String
-  business     Business      @relation("BusinessUsers", fields: [businessId], references: [id])
+  businessId   String?
+  business     Business?     @relation("BusinessUsers", fields: [businessId], references: [id])
   orderUpdates OrderUpdate[]
 
   cashboxId String?
@@ -541,6 +542,7 @@ model PlanDefinition {
   id          String   @id @default(uuid())
   name        String   @unique
   description String?
+  price       Float    @default(0)
   features    Json              // { hasAfipBilling, hasPublicCatalog, ... }
   limits      Json              // { maxUsers, maxProducts, maxCashboxes, maxClients, dailySalesLimit }
   isActive    Boolean  @default(true)
@@ -563,4 +565,37 @@ model DailyUsage {
 
   @@unique([businessId, date])
   @@index([businessId, date])
+}
+
+model SubscriptionPayment {
+  id         String   @id @default(cuid())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  amount     Float
+  method     String      // EFECTIVO | TRANSFERENCIA | MERCADOPAGO | OTRO
+  reference  String?
+  notes      String?
+
+  paidAt     DateTime    @default(now())
+  recordedAt DateTime    @default(now())
+  recordedBy String      // userId del superadmin que registró
+
+  @@index([businessId, paidAt])
+  @@index([businessId, recordedAt])
+}
+
+model SuperadminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String                     // userId del superadmin
+  action     String                     // "create_client", "change_plan", etc.
+  details    Json?                      // payload con datos relevantes
+  targetId   String?                    // businessId, userId, etc.
+  targetType String?                    // "business", "user", "plan", etc.
+  createdAt  DateTime @default(now())
+
+  @@index([adminId, createdAt])
+  @@index([action, createdAt])
+  @@index([createdAt])
+  @@map("superadmin_audit_logs")
 }

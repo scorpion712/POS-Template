@@ -4,7 +4,8 @@ import { db } from "@/lib/db";
 import { auth } from "../../auth";
 import { revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/cache-tags";
-import { requireFeature, assertWritePermission } from "@/lib/auth-gates";
+import { requireFeature, FeatureNotEnabledError } from "@/lib/feature-gates";
+import { assertWritePermission } from "@/lib/auth-gates";
 import { fail } from "@/lib/action-result";
 
 export const getCashboxes = async () => {
@@ -37,8 +38,12 @@ export const createCashbox = async (name: string, initialTotal: number = 0) => {
 
     const count = await db.cashBox.count({ where: { businessId } });
     if (count >= 1) {
-      const featureResult = await requireFeature("hasMultiCashbox");
-      if (!featureResult.success) return fail(featureResult.error);
+      try {
+        await requireFeature(businessId, "multi-cashbox");
+      } catch (e) {
+        if (e instanceof FeatureNotEnabledError) return fail(e.message);
+        throw e;
+      }
     }
 
     const cashbox = await db.cashBox.create({
@@ -163,8 +168,12 @@ export const openSession = async (initialBalance: number) => {
       where: { businessId, status: "OPEN" }
     });
     if (activeSessionsCount >= 1) {
-      const featureResult = await requireFeature("hasMultiCashbox");
-      if (!featureResult.success) return fail(featureResult.error);
+      try {
+        await requireFeature(businessId, "multi-cashbox");
+      } catch (e) {
+        if (e instanceof FeatureNotEnabledError) return fail(e.message);
+        throw e;
+      }
     }
 
     // 1. Verify user has a cashbox assigned

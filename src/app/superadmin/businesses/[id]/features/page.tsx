@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { UserRole } from "@prisma/client";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Shield, Calendar, Building, Hash } from "lucide-react";
+import { ChevronRight, Shield, Calendar, Building, Hash, Users } from "lucide-react";
 import { FeaturesForm } from "./FeaturesForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -75,8 +75,8 @@ export default async function BusinessFeaturesPage({ params }: FeaturesPageProps
   if (business.planDefinition) {
     const resolved = resolveFeatures(
       {
-        features: business.planDefinition.features as Record<string, any>,
-        limits: business.planDefinition.limits as Record<string, any>,
+        features: business.planDefinition.features as Record<string, unknown>,
+        limits: business.planDefinition.limits as Record<string, unknown>,
       },
       null,
     );
@@ -144,22 +144,22 @@ export default async function BusinessFeaturesPage({ params }: FeaturesPageProps
       </nav>
 
       {/* High-Fidelity Header Card */}
-      <Card className="border-none shadow-xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden relative">
-        <div className="absolute inset-0 bg-grid-white/[0.02] bg-[size:20px_20px]" />
+      <Card className="border-none shadow-xl bg-gradient-to-br from-white via-gray-50 to-gray-100 text-gray-900 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 dark:text-white overflow-hidden relative">
+        <div className="absolute inset-0 bg-grid-black/[0.02] dark:bg-grid-white/[0.02] bg-[size:20px_20px]" />
         <div className="absolute right-0 top-0 -mt-12 -mr-12 w-72 h-72 rounded-full bg-blue-500/10 blur-3xl" />
         <div className="absolute left-1/3 bottom-0 -mb-16 w-96 h-96 rounded-full bg-indigo-500/5 blur-3xl" />
         
         <CardHeader className="relative z-10 pb-4">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-400 uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
                 <Shield className="w-3.5 h-3.5" />
                 Superadmin Dashboard
               </div>
-              <CardTitle className="text-3xl md:text-4xl font-extrabold tracking-tight mt-2 bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+              <CardTitle className="text-3xl md:text-4xl font-extrabold tracking-tight mt-2 text-gray-900 dark:bg-gradient-to-r dark:from-white dark:via-slate-100 dark:to-slate-300 dark:bg-clip-text dark:text-transparent">
                 {business.name}
               </CardTitle>
-              <CardDescription className="text-slate-400 text-base max-w-2xl">
+              <CardDescription className="text-gray-500 dark:text-slate-400 text-base max-w-2xl">
                 Configure plan settings, operational limits, and premium feature flag overrides for this organization.
               </CardDescription>
             </div>
@@ -168,7 +168,17 @@ export default async function BusinessFeaturesPage({ params }: FeaturesPageProps
               <Button
                 asChild
                 variant="outline"
-                className="bg-transparent border-slate-700 hover:bg-slate-800 hover:text-white text-slate-300 transition-all duration-200"
+                className="bg-transparent border-gray-200 hover:bg-gray-100 hover:text-gray-900 text-gray-600 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-white dark:text-slate-300 transition-all duration-200"
+              >
+                <Link href={`/superadmin/businesses/${encodeURIComponent(id)}/users`}>
+                  <Users className="w-4 h-4" />
+                  Usuarios
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="bg-transparent border-gray-200 hover:bg-gray-100 hover:text-gray-900 text-gray-600 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-white dark:text-slate-300 transition-all duration-200"
               >
                 <Link href="/superadmin/businesses">
                   Volver a Negocios
@@ -179,51 +189,51 @@ export default async function BusinessFeaturesPage({ params }: FeaturesPageProps
         </CardHeader>
 
         {/* Clean Outline Metadata Section */}
-        <CardContent className="relative z-10 border-t border-slate-800 bg-slate-950/40 p-6 md:p-8">
+        <CardContent className="relative z-10 border-t border-gray-200 bg-gray-50/80 dark:border-slate-800 dark:bg-slate-950/40 p-6 md:p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-slate-300">
-                <Building className="w-5 h-5 text-blue-400" />
+              <div className="p-2.5 rounded-xl bg-white border border-gray-200 dark:bg-slate-800 dark:border-slate-700/50 dark:text-slate-300">
+                <Building className="w-5 h-5 text-blue-600 dark:text-blue-400" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Business Slug</span>
-                <span className="text-sm font-semibold text-slate-200 font-mono bg-slate-800/40 px-2 py-0.5 rounded border border-slate-700/30 w-fit">
+                <span className="text-xs text-gray-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Business Slug</span>
+                <span className="text-sm font-semibold text-gray-700 dark:text-slate-200 font-mono bg-gray-100 dark:bg-slate-800/40 px-2 py-0.5 rounded border border-gray-200 dark:border-slate-700/30 w-fit">
                   {business.slug}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-slate-300">
-                <Hash className="w-5 h-5 text-indigo-400" />
+              <div className="p-2.5 rounded-xl bg-white border border-gray-200 dark:bg-slate-800 dark:border-slate-700/50 dark:text-slate-300">
+                <Hash className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Business ID</span>
-                <span className="text-xs font-semibold text-slate-300 font-mono truncate max-w-[160px]" title={business.id}>
+                <span className="text-xs text-gray-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Business ID</span>
+                <span className="text-xs font-semibold text-gray-500 dark:text-slate-300 font-mono truncate max-w-[160px]" title={business.id}>
                   {business.id}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-slate-300">
-                <Shield className="w-5 h-5 text-emerald-400" />
+              <div className="p-2.5 rounded-xl bg-white border border-gray-200 dark:bg-slate-800 dark:border-slate-700/50 dark:text-slate-300">
+                <Shield className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Owner Contact</span>
-                <span className="text-sm font-semibold text-slate-200 truncate max-w-[200px]" title={owner?.email || "N/A"}>
+                <span className="text-xs text-gray-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Owner Contact</span>
+                <span className="text-sm font-semibold text-gray-700 dark:text-slate-200 truncate max-w-[200px]" title={owner?.email || "N/A"}>
                   {owner?.name || owner?.email || "Sin dueño"}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-slate-800 border border-slate-700/50 text-slate-300">
-                <Calendar className="w-5 h-5 text-purple-400" />
+              <div className="p-2.5 rounded-xl bg-white border border-gray-200 dark:bg-slate-800 dark:border-slate-700/50 dark:text-slate-300">
+                <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
               </div>
               <div className="flex flex-col">
-                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Created At</span>
-                <span className="text-sm font-semibold text-slate-200">
+                <span className="text-xs text-gray-400 dark:text-slate-500 font-semibold uppercase tracking-wider">Created At</span>
+                <span className="text-sm font-semibold text-gray-700 dark:text-slate-200">
                   {business.createdAt.toLocaleDateString("es-AR", {
                     year: "numeric",
                     month: "long",

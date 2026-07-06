@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { requireFeature } from "@/lib/auth-gates";
+import { auth } from "@/lib/auth";
 import BillState from "@/models/BillState";
 import { getArcaCredentialsForBilling } from "./arca";
 

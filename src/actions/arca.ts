@@ -2,7 +2,7 @@
 
 import { db } from "@/lib/db";
 import { UserRole } from "@prisma/client";
-import { auth } from "../../auth";
+import { auth } from "@/lib/auth";
 import { revalidateTag } from "next/cache";
 import { CACHE_TAGS } from "@/lib/cache-tags";
 import { encrypt } from "@/lib/encryption";
